@@ -1,0 +1,6 @@
+@echo off
+echo Building the project with Maven...
+call mvnw.cmd clean package -DskipTests
+
+echo Starting the Spring Boot application...
+java -jar target/order-system-0.0.1-SNAPSHOT.jar
