@@ -141,3 +141,56 @@ While the application is running, you can access the in-memory H2 database conso
 - **Password:** (leave blank)
 
 You can run SQL queries like `SELECT * FROM ORDERS;` to see the data you've manipulated via the API.
+
+---
+
+## 🌳 Environment Profiles
+
+This project is configured to run in multiple environments using Spring Profiles. This allows for different configurations (e.g., database connections) depending on whether the application is running in development, testing, or production.
+
+The following profiles are configured:
+
+- **`dev` (Default):** Uses an in-memory H2 database with a web console. Ideal for local development and quick, interactive testing.
+- **`prod`:** Connects to an external MySQL database. Designed for a production deployment, with sensitive credentials managed via environment variables.
+- **`test`:** Uses a separate in-memory H2 database (`create-drop` mode). This profile is **automatically activated when running automated tests** (e.g., with JUnit) to ensure a clean and isolated environment for each test run.
+
+### How to Activate `dev` or `prod` Profiles
+
+You can activate a specific profile by setting a Java system property when running the application. *The `test` profile is activated automatically by the testing framework.*
+
+#### Running from an IDE (VS Code `launch.json` or IntelliJ)
+Configure your launch settings to include a VM argument:
+- **`dev` Profile:** `-Dspring.profiles.active=dev`
+- **`prod` Profile:** `-Dspring.profiles.active=prod`
+
+#### Running from the Command Line
+Pass the system property directly to the `java -jar` command:
+```bash
+# Example for running with the 'prod' profile on Windows
+java -Dspring.profiles.active=prod -jar target/order-system-0.0.1-SNAPSHOT.jar
+
+# Example for running with the 'prod' profile on Linux/Mac
+java -Dspring.profiles.active=prod -jar target/order-system-0.0.1-SNAPSHOT.jar
+```
+
+---
+
+## 🔐 Environment Variables for Production
+
+When running with the prod profile, you must provide the database credentials as environment variables.
+
+Setting Environment Variables
+
+- On Windows (PowerShell):
+```bash
+$env:DB_USERNAME="your_mysql_user"
+$env:DB_PASSWORD="your_mysql_password"
+```
+
+- On Linux/Mac:
+```bash
+export DB_USERNAME="your_mysql_user"
+export DB_PASSWORD="your_mysql_password"
+```
+
+After setting these variables in your terminal, run the application from the same terminal session.
