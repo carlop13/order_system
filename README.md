@@ -1,32 +1,38 @@
-# MELI Order System API - V1.0.0
+# MELI Order System API - V2.0.0
 
-![Java](https://img.shields.io/badge/Java-17+-orange.svg) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green.svg) ![Maven](https://img.shields.io/badge/Maven-blue.svg) ![H2](https://img.shields.io/badge/Database-H2-lightgrey.svg)
+![Java](https://img.shields.io/badge/Java-17-orange.svg) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-green.svg) ![Maven](https://img.shields.io/badge/Maven-blue.svg) ![Swagger](https://img.shields.io/badge/API-Swagger-blueviolet.svg)
 
-This repository contains the source code for the MELI Order System, a RESTful API developed with Spring Boot. The project was created to address and solve operational issues in an e-commerce order management system, providing a robust, well-documented, and easily testable solution.
+This repository contains the source code for the MELI Order System, a RESTful API developed with Spring Boot. The project was created to provide a robust, configurable, and well-documented solution for an e-commerce order management system, addressing common challenges like multi-environment deployment and API validation.
 
-**Current Version: 1.0.0** (Core CRUD functionality for orders implemented).
+**Current Version: 2.0.0** (Feature-complete with CRUD, advanced search, environment profiles, Swagger documentation, and automated testing).
 
 ---
 
 ## ✨ Key Features
 
-- **Full CRUD Functionality:** Create, Read, Update, and Delete operations for orders.
-- **In-Memory Database:** Utilizes H2 Database for rapid development and testing, with a web console for easy data inspection.
-- **RESTful Architecture:** Follows REST principles for a clean and standard API design.
-- **Automated Build & Run:** Includes a startup script (`startup.bat`) to automate the build and execution process, simulating a real-world deployment.
+- **Advanced Search:** The primary `GET` endpoint supports **pagination** and **sorting** for efficient data retrieval.
+- **Full CRUD Functionality:** Complete Create, Read, Update, and Delete operations for orders.
+- **Input Validation:** Incoming data is automatically validated to ensure data integrity.
+- **Multi-Environment Support:** Uses **Spring Profiles** to manage distinct configurations for `dev`, `test`, and `prod` environments.
+- **Automated API Documentation:** Integrated **Swagger (OpenAPI)** provides a live, interactive documentation UI for all endpoints.
+- **Automated Testing:** Includes a suite of **JUnit 5** integration tests to ensure API reliability.
+- **Secure Configuration:** Sensitive data (like database passwords) is managed via **environment variables**, not hardcoded in the source.
 
 ---
 
 ## 🛠️ Technologies & Dependencies
 
-- **Framework:** Spring Boot 3.x
+- **Framework:** Spring Boot 3.2.5
 - **Language:** Java 17
 - **Build Tool:** Apache Maven
-- **Core Dependencies:**
-  - `Spring Web`: For building RESTful web applications.
-  - `Spring Data JPA`: For data persistence and repository management.
-  - `H2 Database`: For the in-memory relational database.
-- **API Testing:** Postman
+- **Data Persistence:** Spring Data JPA, Hibernate
+- **Databases:**
+  - H2 (for `dev` and `test` profiles)
+  - MySQL (for `prod` profile)
+- **API Documentation:** Springdoc OpenAPI (Swagger)
+- **Validation:** Spring Boot Starter Validation (JSR 303)
+- **Testing:** Spring Boot Starter Test (JUnit 5, MockMvc)
+- **Utilities:** Lombok
 
 ---
 
@@ -37,8 +43,9 @@ Follow these instructions to get the project running on your local machine.
 ### Prerequisites
 
 - Java Development Kit (JDK) 17 or higher.
-- Apache Maven (can be installed or used via the included Maven Wrapper).
-- [Postman](https://www.postman.com/downloads/) for testing the API.
+- Apache Maven.
+- A running instance of MySQL Server (for the `prod` profile).
+- [Postman](https://www.postman.com/downloads/) (optional, for manual testing).
 
 ### Installation & Execution
 
@@ -48,25 +55,51 @@ Follow these instructions to get the project running on your local machine.
     cd order_system
     ```
 
-2.  **Run the Startup Script:**
-    This is the recommended way to build and run the application. The script automates both steps.
-    
-    Open a terminal (Command Prompt or PowerShell on Windows) in the project's root directory and run:
-    ```bash
-    .\startup.bat
-    ```
-    The script will first compile and package the application into a `.jar` file using Maven, and then it will launch the server.
+2.  **Set up the Production Database (Optional, for `prod` profile):**
+    - Connect to your MySQL instance and create the database:
+      ```sql
+      CREATE DATABASE IF NOT EXISTS meli_orders_prod;
+      ```
+    - The table will be created automatically by JPA upon first launch.
 
-3.  **Verify the Application is Running:**
-    The server will start on `http://localhost:8080`. You will see the Spring Boot banner and log messages confirming the startup.
+3.  **Build the project:**
+    Open a terminal in the project's root directory and run:
+    ```bash
+    .\mvnw.cmd clean package
+    ```
+
+4.  **Run the application:**
+    The application can be launched with different profiles. See the **Environment Profiles** section below for details on how to activate them. By default, it will run with the `dev` profile.
+    ```bash
+    java -jar target/order-system-0.0.1-SNAPSHOT.jar
+    ```
+    The server will start on `http://localhost:8080`.
 
 ---
 
-## 🛰️ API Endpoints (CRUD)
+## 📖 API Documentation (Swagger)
+
+This API is self-documented using Swagger/OpenAPI. Once the application is running, you can access the interactive UI to view and test all endpoints.
+
+- **Swagger UI URL:** `http://localhost:8080/swagger-ui.html`
+
+---
+
+## 🛰️ API Endpoints
 
 All endpoints are available under the base path `/api/orders`.
 
-### 1. Create an Order
+### 1. Get All Orders (with Pagination & Sorting)
+
+- **URL:** `/`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `page`: The page number to retrieve (starts at 0).
+  - `size`: The number of items per page.
+  - `sort`: The field to sort by, optionally followed by `,asc` or `,desc` (e.g., `sort=customerName,desc`).
+- **Success Response (`200 OK`):** A paginated JSON object.
+
+### 2. Create an Order
 
 - **URL:** `/`
 - **Method:** `POST`
@@ -81,12 +114,6 @@ All endpoints are available under the base path `/api/orders`.
   ```
 - **Success Response:**
   - **Code:** `(201 Created): The newly created order document, including its unique id.`
-
-### 2. Get All Orders
-- **URL:** `/`
-- **Method:** `GET`
-- **Success Response:**
-  - **Code:** `(200  OK): A JSON array containing all existing orders.`
 
 ### 3. Get Order by ID
 - **URL:** `/{id}`
@@ -112,7 +139,7 @@ All endpoints are available under the base path `/api/orders`.
 - **Success Response:**
   - **Code:** `(200 OK): The updated order document.`
 
-### 2. Delete an Order
+### 5. Delete an Order
 - **URL:** `/{id}`
 - **Method:** `DELETE`
 - **Success Response:**

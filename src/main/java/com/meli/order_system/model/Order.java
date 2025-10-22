@@ -1,10 +1,7 @@
 package com.meli.order_system.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 /**
@@ -20,9 +17,20 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Customer name cannot be blank") // VALIDACIÓN
+    @Size(min = 3, max = 100, message = "Customer name must be between 3 and 100 characters") // VALIDACIÓN
     private String customerName;
+
+    @NotBlank(message = "Product cannot be blank") // VALIDACIÓN
     private String product;
+
+    @NotNull(message = "Quantity cannot be null") // VALIDACIÓN
+    @Min(value = 1, message = "Quantity must be at least 1") // VALIDACIÓN
     private int quantity;
+
+    @NotNull(message = "Price cannot be null") // VALIDACIÓN
+    @Positive(message = "Price must be a positive value") // VALIDACIÓN
     private double price;
+    
     private String status = "PENDING"; // Default status
 }
